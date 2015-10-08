@@ -49,9 +49,7 @@ import java.util.Arrays;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
@@ -67,6 +65,7 @@ public class DrugOrderMapper1_11Test {
     public static final String MOUTH_ROUTE = "mouth";
     public static final String TABLET_QUANTITY_UNIT = "TABLET";
     public static final String TWICE_A_DAY_FREQUENCY = "Twice a day";
+    public static final String NON_CODED_DRUG = "Non Coded Drug";
 
     private OrderMapper1_11 drugOrderMapper110;
 
@@ -203,4 +202,23 @@ public class DrugOrderMapper1_11Test {
         return doseUnitsConcept;
     }
 
+    @Test
+    public void shouldNotSetsDrugOrdersDrugNonCodedFieldForCodedDrugOrders() throws NoSuchFieldException, IllegalAccessException {
+        DrugOrder openMrsDrugOrder = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", "previousOrderUuid", "ORD-100");
+        EncounterTransaction.DrugOrder drugOrder = drugOrderMapper110.mapDrugOrder(openMrsDrugOrder);
+
+        assertNull(drugOrder.getDrugNonCoded());
+        assertNotNull(drugOrder.getDrug());
+    }
+
+    @Test
+    public void shouldSetsTheDrugOrdersDrugNonCodedForNonCodedDrugOrders() throws NoSuchFieldException, IllegalAccessException {
+        DrugOrder openMrsDrugOrder = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", "previousOrderUuid", "ORD-100");
+        openMrsDrugOrder.setDrugNonCoded(NON_CODED_DRUG);
+        openMrsDrugOrder.setDrug(null);
+        EncounterTransaction.DrugOrder drugOrder = drugOrderMapper110.mapDrugOrder(openMrsDrugOrder);
+
+        assertNotNull(drugOrder.getDrugNonCoded());
+        assertNull(drugOrder.getDrug());
+    }
 }

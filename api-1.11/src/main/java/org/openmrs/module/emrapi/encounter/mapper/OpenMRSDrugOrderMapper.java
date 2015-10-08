@@ -56,13 +56,18 @@ public class OpenMRSDrugOrderMapper {
 
         Drug drug = getDrugFrom(drugOrder, openMRSDrugOrder);
 
-        if (drug == null) {
+        if (drug == null && drugOrder.getDrugNonCoded() == null) {
             throw new APIException("No such drug : " + drugOrder.getDrug().getName());
         }
-        if(drug.isRetired() && !isDiscontinuationDrugOrder(drugOrder)){
-            throw new APIException("Drug has been retired : " + drugOrder.getDrug().getName());
+        if (drug != null) {
+            if(drug.isRetired() && !isDiscontinuationDrugOrder(drugOrder)){
+                throw new APIException("Drug has been retired : " + drugOrder.getDrug().getName());
+            }
+            openMRSDrugOrder.setDrug(drug);
         }
-        openMRSDrugOrder.setDrug(drug);
+        else if (drugOrder.getDrugNonCoded() != null){
+            openMRSDrugOrder.setDrugNonCoded(drugOrder.getDrugNonCoded());
+        }
         openMRSDrugOrder.setEncounter(encounter);
 
         openMRSDrugOrder.setDateActivated(drugOrder.getDateActivated());

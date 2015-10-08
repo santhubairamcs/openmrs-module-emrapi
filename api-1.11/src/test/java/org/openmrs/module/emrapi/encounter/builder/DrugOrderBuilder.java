@@ -84,4 +84,9 @@ public class DrugOrderBuilder {
         drugOrder.setAutoExpireDate(date);
         return this;
     }
+
+    public DrugOrderBuilder withDrugNonCoded(String drugNonCoded) {
+        drugOrder.setDrugNonCoded(drugNonCoded);
+        return this;
+    }
 }

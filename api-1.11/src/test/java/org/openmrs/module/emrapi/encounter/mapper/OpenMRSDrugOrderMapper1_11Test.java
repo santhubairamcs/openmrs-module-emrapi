@@ -59,6 +59,7 @@ public class OpenMRSDrugOrderMapper1_11Test {
     public static final String OUT_PATIENT_CARE_SETTING = "OUTPATIENT";
     public static final String DAY_DURATION_UNIT = "day";
     public static final String DRUG_UUID = "drug-uuid";
+    public static final String NON_CODED_DRUG = "non-coded-drug";
     private final Concept DAY_DURATION_CONCEPT = new Concept();
 
     @Mock
@@ -233,4 +234,27 @@ public class OpenMRSDrugOrderMapper1_11Test {
         };
     }
 
+    @Test
+    public void shouldNotSetsDrugOrdersDrugNonCodedFieldForCodedDrugOrders() throws ParseException {
+        EncounterTransaction.DrugOrder drugOrder = new DrugOrderBuilder().withDrugUuid(DRUG_UUID).withDurationUnits(DAY_DURATION_UNIT).build();
+        DrugOrder openMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
+
+        drugOrder.setAction(Order.Action.REVISE.name());
+        drugOrder.setPreviousOrderUuid(openMrsDrugOrder.getUuid());
+        when(orderService.getOrderByUuid(openMrsDrugOrder.getUuid())).thenReturn(openMrsDrugOrder);
+        DrugOrder revisedOpenMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
+        assertNull(revisedOpenMrsDrugOrder.getDrugNonCoded());
+    }
+
+    @Test
+    public void shouldSetsDrugOrdersDrugNonCodedFieldForNonCodedDrugOrders() throws ParseException {
+        EncounterTransaction.DrugOrder drugOrder = new DrugOrderBuilder().withDurationUnits(DAY_DURATION_UNIT).withDrugNonCoded(NON_CODED_DRUG).build();
+        DrugOrder openMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
+
+        drugOrder.setAction(Order.Action.REVISE.name());
+        drugOrder.setPreviousOrderUuid(openMrsDrugOrder.getUuid());
+        when(orderService.getOrderByUuid(openMrsDrugOrder.getUuid())).thenReturn(openMrsDrugOrder);
+        DrugOrder revisedOpenMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
+        assertNotNull(revisedOpenMrsDrugOrder.getDrugNonCoded());
+    }
 }

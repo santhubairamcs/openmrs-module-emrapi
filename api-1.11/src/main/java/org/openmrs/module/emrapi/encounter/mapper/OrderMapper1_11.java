@@ -87,9 +87,10 @@ public class OrderMapper1_11 implements OrderMapper {
             drugOrder.setPreviousOrderUuid(previousOrder.getUuid());
         }
 
-        EncounterTransaction.Drug encounterTransactionDrug = new DrugMapper1_11().map(openMRSDrugOrder.getDrug());
-        drugOrder.setDrug(encounterTransactionDrug);
-
+        if (openMRSDrugOrder.getDrug() != null) {
+            EncounterTransaction.Drug encounterTransactionDrug = new DrugMapper1_11().map(openMRSDrugOrder.getDrug());
+            drugOrder.setDrug(encounterTransactionDrug);
+        }
         drugOrder.setDosingInstructionType(openMRSDrugOrder.getDosingType().getName());
         drugOrder.setDuration(openMRSDrugOrder.getDuration());
         drugOrder.setDurationUnits(getConceptName(openMRSDrugOrder.getDurationUnits()));
@@ -123,6 +124,9 @@ public class OrderMapper1_11 implements OrderMapper {
         drugOrder.setVoided(openMRSDrugOrder.getVoided());
         drugOrder.setVoidReason(openMRSDrugOrder.getVoidReason());
         drugOrder.setOrderNumber(openMRSDrugOrder.getOrderNumber());
+        if (openMRSDrugOrder.getDrugNonCoded() != null) {
+            drugOrder.setDrugNonCoded(openMRSDrugOrder.getDrugNonCoded());
+        }
 
         return drugOrder;
     }

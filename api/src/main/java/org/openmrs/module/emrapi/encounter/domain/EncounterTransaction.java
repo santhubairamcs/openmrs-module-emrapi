@@ -769,6 +769,7 @@ public class EncounterTransaction {
         private String durationUnits;
         private Boolean voided;
         private String voidReason;
+        private String drugNonCoded;
 
         public Drug getDrug() {
             return drug;
@@ -871,6 +872,14 @@ public class EncounterTransaction {
 
         public String getVoidReason() {
             return voidReason;
+        }
+
+        public String getDrugNonCoded() {
+            return drugNonCoded;
+        }
+
+        public void setDrugNonCoded(String drugNonCoded) {
+            this.drugNonCoded = drugNonCoded;
         }
     }
 
